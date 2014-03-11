@@ -16,39 +16,57 @@ public class Client
 	static String state="false";
 	public static void main(String args[]) throws UnknownHostException, IOException
 	{
-		System.out.println("enter server name");
+		System.out.println("enter server name");                                       //to read the inputs from the user
 		Scanner s=new Scanner(System.in);
 		servername=s.nextLine();
 		System.out.println("enter port number");
 		portnumber=s.nextInt();
-		Socket client=new Socket(servername,portnumber);
+		
 		
 		while(state.equals("false"))
 		{
-			System.out.println("Enter your ID");
+			Socket client=new Socket(servername,portnumber);
+			System.out.println("Enter your ID");                         //to read the id and password
 			s=new Scanner(System.in);
 			Id=s.nextLine();
 			s=new Scanner(System.in);
 			System.out.println("Enter password");
 			password=s.nextLine();
 			
-			String temp=Id+"#"+password;
+			String temp=Id+"#"+password;                           //id and password in one string with # as delimiter
 			
 			OutputStream outToServer = client.getOutputStream();
 			DataOutputStream out=new DataOutputStream(outToServer);
-			out.writeUTF(temp);
+			out.writeUTF(temp);                                       //writing to the server
 			
 			InputStream inFromServer=client.getInputStream();
 			DataInputStream in=new DataInputStream(inFromServer);
-			state=in.readUTF();
+			state=in.readUTF();                                     //reader from the server
 			//System.out.println(state);
-				if(state.equals("true"))
+				if(state.equals("true"))                      //if correct login credentials given
 				{
 					System.out.println("logged in succesfully");
-					break;
+					System.out.println("Enter the command: ");
+					s=new Scanner(System.in);                      //to read the command
+					String commandgiven=s.nextLine();
+					if(commandgiven.equalsIgnoreCase("list"))        //if list is given as the command
+					{
+						out.writeUTF(commandgiven);
+						String k=in.readUTF();
+						System.out.println("k val: "+k);
+						String[] r=k.split("#");                    //to display all the files in the given directory
+						for(int i=0;i<r.length;i++)
+						{
+							System.out.println(r[i]);          //to print on console
+						}
+					}
 				}
 				else
-					System.out.println("wrong id or password");
+				{
+					System.out.println("wrong id or password");     //to prompt the wrong password or username
+					client.close();
+					
+				}
 		}
 	
 		
