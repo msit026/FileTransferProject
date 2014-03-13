@@ -54,6 +54,12 @@ IOException
 			else  // if no path is specified, change directory to root folder
 				return changeDir(rootDir);
 		}
+		
+		if(cmdSplit[0].equalsIgnoreCase("help"))
+			
+			 return help();
+		
+		
 		if(cmdSplit[0].equalsIgnoreCase("delete"))
 			return delete(path + "/" + cmdSplit[1]);
 		if(cmdSplit[0].equalsIgnoreCase("rename"))
@@ -240,6 +246,8 @@ IOException
 	}
 	
 	
+	
+	
 	public static byte[] downLoad() throws Exception
 	{
 		   buf=new byte[14*1024];
@@ -250,7 +258,7 @@ IOException
 			  
 			   array=new byte[c];
 			   System.arraycopy(buf, 0, array, 0,c);
-			   System.out.println(buf.length + "-- In while of command : " +count);
+			   System.out.println(array.length + "-- In while of command : " +count);
 			   count++;
 			   return array;  
 		   }
@@ -552,6 +560,24 @@ IOException
 		{
 			
 		}
+	}
+	
+	public static String help()
+	{
+		String mar="\n------------------------------------------------------------------------------------------\n";
+		String list="List  -- To see all the files that are present in the root folder \n\t\t Syntax: list\n------------------------------------------------------------------------------------------\n";
+		String upload="Upload -- To upload a file to the server \n \t\t Syntax: upload <Path> <File Name>\n\t-- To upload " +
+				       "a file to server with desired name \n \t\t Syntax: upload path <File Name> <desired File Name\n------------------------------------------------------------------------------------------\n";
+		String download="Download -- To download a file fromt the server \n \t\t Syntax: download <FileName> <Path>\n------------------------------------------------------------------------------------------\n";
+		String delete="Delete -- To delete a file from the server\n\t\t Syntax: delete <File Name>\n------------------------------------------------------------------------------------------\n";
+		String changedir="Change directory -- To change the directory we are working on\n\t\t Syntax: changedir <Path>\n------------------------------------------------------------------------------------------\n";
+		String rename="Rename -- To rename the file in the server\n\t\t Syntax: rename <File Name>\n------------------------------------------------------------------------------------------\n";
+		String logout="Logout -- To logout and close the session\n\t\t Syntax: logout\n------------------------------------------------------------------------------------------\n";
+		String move="Move -- To move a file in the server from one directory to another\n\t\t Syntax: move <File Name> <path>\n------------------------------------------------------------------------------------------\n";
+        String help="Help -- Display all the commands and syntax \n\t\t Syntax: move <File Name> <path>\n------------------------------------------------------------------------------------------\n";
+		String newdir="New directory -- To create a new directory\n\t\t Syntax: newdir <directory>\n------------------------------------------------------------------------------------------\n";
+		String cmp=mar+list+newdir+changedir+logout+upload+download+delete+rename+move+help;
+		return cmp;
 	}
 
 

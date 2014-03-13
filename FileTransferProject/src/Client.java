@@ -116,18 +116,19 @@ public class Client
 							int dataPort = Integer.parseInt(in.readUTF());
 							Socket dataSocket = new Socket(servername,dataPort);
 							bis=new BufferedInputStream(dataSocket.getInputStream());
-							outr=new FileOutputStream(commandgiven[2]+"/"+ commandgiven[1]);
+							outr=new FileOutputStream(commandgiven[2]+"/"+ commandgiven[1],true);
 							bos=new BufferedOutputStream(outr);
 							byte[] buf=new byte[14*1024];
 							byte[] array;
 						   int c;
 						   int count = 0;
-						   while((c=bis.read(buf))>0)
+						   while((c=bis.read(buf))!=-1)//try with >0
 						   {
 							   array = new byte[c];
 							   System.arraycopy(buf, 0, array, 0, c);
-								  System.out.println(buf.length +"In while of client download: " + (++count));
-								   bos.write(array);   
+								  System.out.println(array.length +"In while of client download: " + (++count));
+								   bos.write(array);
+								   bos.flush();
 						   }
 							bos.close();
 							dataSocket.close();

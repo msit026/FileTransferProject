@@ -16,32 +16,85 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 
-public class Server {
+
+
+public class Server extends Thread{
 	
 	static ServerSocket serverSocket;
-	static String fromClient="";
-	static String Id="";
-	static String password="";
-	static HashMap<Integer,Boolean> ports = new HashMap<Integer,Boolean>();
-	static int portNumbers[];
+	
+	
 	public static void main(String args[]) throws Exception
 	{
-		fillPorts();
-		Connection con=connection.getConnection();                     //to get connected with the database
-		Statement stmt=con.createStatement();
 		
-		serverSocket=new  ServerSocket(4444);                       //server socket
-		Socket server;
+		
+		try
+		{
+			serverSocket=new ServerSocket(4444);
+			while(true)
+			{
+				Socket sock=serverSocket.accept();
+				MyThread mt=new MyThread(sock);
+				System.out.println("Thread Created");
+				mt.start();
+			}
+			
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		
+		
+		
+	}
+}
+		
+		
+		
+		
+		
+		
+		
+		
+		class MyThread extends Thread
+		{
+			String fromClient="";
+			Socket s;
+			String Id="";
+			String password="";
+			int portNumbers[];
+			HashMap<Integer,Boolean> ports = new HashMap<Integer,Boolean>();
+			
+			
+			
+			public MyThread(Socket sock) {
+				// TODO Auto-generated constructor stub
+				s=new Socket();
+				s=sock;
+			}
+			
+			public void run()
+			{
+				
+				
+				
+				
+				try
+				{
+				
+				
+				Connection con=connection.getConnection();                     //to get connected with the database
+				Statement stmt=con.createStatement();
 		
 		while(true)
 		{
-			System.out.println("Waiting for the client to connect on port "+serverSocket.getLocalPort());
-			server = serverSocket.accept();                                           //connecting to the client
-			
-			DataInputStream in = new DataInputStream(server.getInputStream());	 //to read from the client
+			                                          //connecting to the client
+			fillPorts();
+			DataInputStream in = new DataInputStream(s.getInputStream());	 //to read from the client
 			fromClient=in.readUTF();
 			
-			DataOutputStream out=new DataOutputStream(server.getOutputStream());//creating data stream to write to client
+			DataOutputStream out=new DataOutputStream(s.getOutputStream());//creating data stream to write to client
 			
 			String[] temp=fromClient.split("#");          //to split the id and passwrd
 			
@@ -122,6 +175,7 @@ public class Server {
 						   //bis.read(buf);
 						   ports.put(selectedPort, true);
 						   dataSocket.close();
+						   dataServerSocket.close();
 						   //System.out.println(buf);  
 						out.writeUTF("Upload Succesful!");
 				     }
@@ -154,12 +208,17 @@ public class Server {
 						  do {
 							  
 							   array=Command.downLoad();
-							  // System.out.println("array lenght+"+array.length);
+							  
 							   if(array!=null)
+							   {
+								   System.out.println("array lenght+"+array.length);
 								   bos.write(array);
-						
+							   }
 							   System.out.println("inside while of server "+(++count));
 						   }while( array!=null && array.length>0);
+						  
+						  
+						  
 						   System.out.println("after while in server---");
 						   ports.put(selectedPort, true);
 						   dataSocket.close();
@@ -185,31 +244,40 @@ public class Server {
 			
 	
 		}	//end of while
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
 	
 	}
-	private static void fillPorts() {
-		ports.put(234, true);
-		ports.put(921, true);
-		ports.put(232, true);
-		ports.put(345, true);
-		ports.put(4354, true);
-		ports.put(5674, true);
-		ports.put(2343, true);
-		ports.put(7862, true);
-		ports.put(2831, true);
-		ports.put(288, true);
-		
-		portNumbers = new int[10];
-		portNumbers[0] = 234;
-		portNumbers[1] = 921;
-		portNumbers[2] = 232;
-		portNumbers[3] = 345;
-		portNumbers[4] = 4354;
-		portNumbers[5] = 5674;
-		portNumbers[6] = 2343;
-		portNumbers[7] = 7862;
-		portNumbers[8] = 2831;
-		portNumbers[9] = 288;
-		
-	}
+			
+			
+			private void fillPorts() {
+				ports.put(234, true);
+				ports.put(921, true);
+				ports.put(232, true);
+				ports.put(345, true);
+				ports.put(4354, true);
+				ports.put(5674, true);
+				ports.put(2343, true);
+				ports.put(7862, true);
+				ports.put(2831, true);
+				ports.put(288, true);
+				
+				portNumbers = new int[10];
+				portNumbers[0] = 234;
+				portNumbers[1] = 921;
+				portNumbers[2] = 232;
+				portNumbers[3] = 345;
+				portNumbers[4] = 4354;
+				portNumbers[5] = 5674;
+				portNumbers[6] = 2343;
+				portNumbers[7] = 7862;
+				portNumbers[8] = 2831;
+				portNumbers[9] = 288;
+				
+			}
+	
 }
+
