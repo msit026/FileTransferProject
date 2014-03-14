@@ -7,7 +7,7 @@ public class connection {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/filetransfer","root","root");
-			System.out.println("Connection Established....");
+			//System.out.println("Connection Established....");
 		} catch(SQLException sqlEx) {
 			sqlEx.printStackTrace();
 		}

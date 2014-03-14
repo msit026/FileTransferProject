@@ -2,6 +2,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.OutputStream;
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -35,7 +36,8 @@ public class Server extends Thread{
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			System.out.println("Error in thread creation!");
+			//e.printStackTrace();
 		}
 		
 		
@@ -95,10 +97,10 @@ public class Server extends Thread{
 					String q="select * from user_details where id='"+Id+"' and password='"+password+"';";	//checking in the database
 					
 					ResultSet str=stmt.executeQuery(q);
-					System.out.println("str values"+str);
+					
 					if(str.next())
 					{
-						//System.out.println("inside if of server");
+						
 						 Command.setid(Id);
 						 Command.storeLastLoggedIn();
 					     out.writeUTF("true");	                                        //sending the authentication status to the client
@@ -108,7 +110,7 @@ public class Server extends Thread{
 						    cmd=in.readUTF();                                       //to read the command
 						                                        //to write the result of given command to the client
 					     
-						     System.out.println("after cmd");
+						     //System.out.println("after cmd");
 						     
 						     String[] cmdSplit = cmd.split(" ");
 						     if(cmdSplit[0].equalsIgnoreCase("upload"))
@@ -140,7 +142,7 @@ public class Server extends Thread{
 					    	 		}while(!ports.get(selectedPort));
 						    	 	
 						    	 	int authPin = (int)(Math.random() * 320);
-						    	 	System.out.println("authpin:" + authPin);
+						    	 	//System.out.println("authpin:" + authPin);
 						    	 	out.writeUTF(authPin + "");
 						    	 	
 						    	 	if(in.readUTF().equalsIgnoreCase("404"))
@@ -167,12 +169,12 @@ public class Server extends Thread{
 									   
 									   array=new byte[c];
 									   System.arraycopy(buf, 0, array, 0,c);
-									   System.out.println(array.length + "--In while of server: " + (++count));
+									   //System.out.println(array.length + "--In while of server: " + (++count));
 									   Command.createfile(cmd);
 									   Command.uploadintofile(array);	
 									  
 								   }
-								   System.out.println("After while in server");
+								   //System.out.println("After while in server");
 								 
 								   ports.put(selectedPort, true);
 								   dataSocket.close();
@@ -192,69 +194,78 @@ public class Server extends Thread{
 						     }
 						     else if(cmdSplit[0].equalsIgnoreCase("download"))
 					    	 {
-						    	 System.out.println("here");
-						    	 if(cmdSplit.length < 3) // invalid command
-								{
-									continue;
-								}
-						    	 int selectedPort;
-					    	 	do
-				    	 		{
-				    	 			
-					    	 		int ran = (int)(Math.random() * portNumbers.length-1);
-				    	 			selectedPort = portNumbers[ran];
-				    	 			
-				    	 		}while(!ports.get(selectedPort));
-					    	 	
-					    	 	
-					    	 	int authPin = (int)(Math.random() * 320);
-					    	 	out.writeUTF(authPin + "");
-					    	 	
-					    	 	if(!in.readUTF().equalsIgnoreCase(authPin + ""))
-						    	{
-						    		System.out.println("Authentication failed/File not found!!");
-						    		continue;
-						    	}
-					    	 	
-					    	 	ports.put(selectedPort,false);
-					    	 	ServerSocket dataServerSocket = new ServerSocket(selectedPort);
-					    	 	out.writeUTF(selectedPort + "");
-					    	 	Socket dataSocket = dataServerSocket.accept();
+						    	 try
+						    	 {
+							    	 //System.out.println("here");
+							    	 if(cmdSplit.length < 3) // invalid command
+									{
+										continue;
+									}
+							    	 int selectedPort;
+						    	 	do
+					    	 		{
+					    	 			
+						    	 		int ran = (int)(Math.random() * portNumbers.length-1);
+					    	 			selectedPort = portNumbers[ran];
+					    	 			
+					    	 		}while(!ports.get(selectedPort));
 						    	 	
-					    		 Command.initiateDownLoad(cmd);
-					    		 
-					    		 byte[] array;
-								   BufferedOutputStream bos= new BufferedOutputStream(dataSocket.getOutputStream()); 
-								   
-								   int count = 0;
-								   
-								   
-								  do {
+						    	 	
+						    	 	int authPin = (int)(Math.random() * 320);
+						    	 	out.writeUTF(authPin + "");
+						    	 	
+						    	 	if(!in.readUTF().equalsIgnoreCase(authPin + ""))
+							    	{
+							    		System.out.println("Authentication failed/File not found!!");
+							    		continue;
+							    	}
+						    	 	
+						    	 	ports.put(selectedPort,false);
+						    	 	ServerSocket dataServerSocket = new ServerSocket(selectedPort);
+						    	 	out.writeUTF(selectedPort + "");
+						    	 	Socket dataSocket = dataServerSocket.accept();
+							    	 	
+						    		 Command.initiateDownLoad(cmd);
+						    		 
+						    		 byte[] array;
+									  BufferedOutputStream bos= new BufferedOutputStream(dataSocket.getOutputStream()); 
+									   OutputStream os = dataSocket.getOutputStream();
+									   int count = 0;
+									   
+									   
+									  do {
+										  
+										   array=Command.downLoad();
+										  
+										   if(array!=null)
+										   {
+											   //System.out.println("array lenght+"+array.length);
+											   os.write(array);
+										   }
+										   //System.out.println("inside while of server "+(++count));
+									   }while( array!=null && array.length>0);
 									  
-									   array=Command.downLoad();
 									  
-									   if(array!=null)
-									   {
-										   System.out.println("array lenght+"+array.length);
-										   bos.write(array);
-									   }
-									   System.out.println("inside while of server "+(++count));
-								   }while( array!=null && array.length>0);
-								  
-								  
-								  
-								   System.out.println("after while in server---");
-								   ports.put(selectedPort, true);
-								   dataSocket.close();
-								   dataServerSocket.close();
-								   bos.close();    
-								   System.out.println("Closed!");
-								   long fileSize = Long.parseLong(in.readUTF());
-								   System.out.println("Closed12!");
-								   if(Command.closeFileAndVerify(fileSize))
-									   out.writeUTF("Downloaded the file successfully!");
-								   else
-									   out.writeUTF("Download unsuccessful! Try again.");
+									  
+									   //System.out.println("after while in server---");
+									   ports.put(selectedPort, true);
+									   dataSocket.close();
+									   dataServerSocket.close();
+									   bos.close();    
+									   //System.out.println("Closed!");
+									   long fileSize = Long.parseLong(in.readUTF());
+									   //System.out.println("Closed12!");
+									  // out.writeUTF("Downloaded the file successfully!");
+									   
+									   if(Command.closeFileAndVerify(fileSize))
+										   out.writeUTF("Downloaded the file successfully!");
+									   else
+										   out.writeUTF("Download unsuccessful! Try again.");
+						    	 }catch(Exception e)
+						    	 {
+						    		 System.out.println("Error in downloading!! Please check the file name,syntax and try again");
+						    		 continue;
+						    	 }
 					    	 }
 					    	 else
 					    	 {
@@ -285,8 +296,8 @@ public class Server extends Thread{
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
-				
+				//e.printStackTrace();
+				System.out.println("Error in the system! Please try again later!");
 			}
 
 		}

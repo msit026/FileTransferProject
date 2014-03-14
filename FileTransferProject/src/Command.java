@@ -78,12 +78,12 @@ IOException
 					
 			if(cmd.contains("upload"))
 			{
-				System.out.println("inside upload");
+				//System.out.println("inside upload");
 				String destinationpath="D:/FTP";
 				String[] k=cmd.split(" ");
 				k[1].replace('\\','/');
 				String path=k[1]+"/"+k[2];
-				System.out.println(path);
+				//System.out.println(path);
 				String kr=destinationpath+"/"+k[2];
 				if(k.length==3)
 				{
@@ -129,7 +129,8 @@ IOException
 						return aa;
 			        }
 					catch (IOException e) {
-						e.printStackTrace();
+						System.out.println("Error in uploading the file!");
+						//e.printStackTrace();
 					}
 				}
 				
@@ -185,14 +186,14 @@ IOException
 	{
 		buf=new byte[14*1024];
 		buf=x;
-		System.out.println(x.length + "-- In command -- " + (++check));
+		//System.out.println(x.length + "-- In command -- " + (++check));
 //		if(buf.length>0)
 //		   {
 		     bos.write(x);
 		     bos.close();
 		   //}
 		//fos.close();
-		     System.out.println("After write in command");
+		     //System.out.println("After write in command");
 		return "ready";
 	}
 	
@@ -212,7 +213,7 @@ IOException
 			if(fos != null && bis == null)// if upload
 			{
 				f.delete();
-				System.out.println("Here in closefile of command");
+				//System.out.println("Here in closefile of command");
 			}
 			return false;
 		}
@@ -221,7 +222,8 @@ IOException
 	
 	public static String createfile(String cmd) throws FileNotFoundException
 	{
-		System.out.println("inside create file");
+		filePath = "";
+		//System.out.println("inside create file");
 		String[] a=cmd.split(" ");
 		//destinationpath="D:/FTP";
 		if(a.length==3)
@@ -234,7 +236,7 @@ IOException
 			filePath=path+"/"+a[3];
 			filename=a[3];
 		}
-		System.out.println("path: "+filePath);
+		//System.out.println("path: "+filePath);
 		//File f=new File("path");
 		fos=new FileOutputStream(filePath,true);
 		bos= new BufferedOutputStream(fos);
@@ -248,7 +250,7 @@ IOException
 		Statement stmt=con.createStatement();
 		   File f=new File(filePath);
 		   String qry="insert into files values('"+filePath+"','"+id+"','"+f.length()+"','0','"+filename+"');";
-		   System.out.println(qry);
+		   //System.out.println(qry);
 		   int b=stmt.executeUpdate(qry);
 		   if(b > 0)
 			   System.out.println("sucessfully added");
@@ -260,7 +262,7 @@ IOException
 	
 	public static String displayAllFiles() //Displays all the files in the given directory
 	{
-		System.out.println("inside displayfiels");
+		//System.out.println("inside displayfiels");
 		
 		  String files="";
 		  File folder = new File(path);
@@ -297,19 +299,21 @@ IOException
 		}
 		catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
+			System.out.println("Could not enter into Database!");
 		}       
 		return false;
 	}
 
 
-	public static void initiateDownLoad(String command) 
+	public static void initiateDownLoad(String command) throws Exception
 	{
-		System.out.println("inside initiate download");
+		filePath = "";
+		//System.out.println("inside initiate download");
 		Connection con;
 		count=0;
-		try {
-			con = connection.getConnection();
+		
+		con = connection.getConnection();
 		              //to get connected with the database
 		Statement stmt=con.createStatement();
 		String[] a=command.split(" ");
@@ -323,10 +327,7 @@ IOException
 		in=new FileInputStream(filePath);
 		bis=new BufferedInputStream(in);
 		//Command.downLoad();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}       
+		      
 	}
 	
 	
@@ -342,7 +343,7 @@ IOException
 			  
 			   array=new byte[c];
 			   System.arraycopy(buf, 0, array, 0,c);
-			   System.out.println(array.length + "-- In while of command : " +count);
+			   //System.out.println(array.length + "-- In while of command : " +count);
 			   count++;
 			   return array;  
 		   }
@@ -375,7 +376,7 @@ IOException
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return "Could not create directory.";
 	}
@@ -401,7 +402,7 @@ IOException
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return "Could not find directory specified.";
 	}
@@ -455,7 +456,7 @@ IOException
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return "Could not delete the directory.";
 	}
@@ -498,7 +499,7 @@ IOException
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return "Could not delete the file.";
 	}
@@ -542,9 +543,9 @@ IOException
 					q = "delete from files where file_path = '" + oldName + "' and id = '" + id + "';";
 					int r = stmt.executeUpdate(q);
 					File f4 = new File(oldName);
-					System.out.println("file size: " + f4.length());
+					//System.out.println("file size: " + f4.length());
 					q = "insert into files values('" + newName + "', '" + id + "', '" + f4.length() + "', 0, '" + newFileName + "');";
-					System.out.println("query : " + q);
+					//System.out.println("query : " + q);
 					int r1 = stmt.executeUpdate(q);
 					if(r > 0 && r1 > 0)
 					{
@@ -574,7 +575,7 @@ IOException
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return "Could not rename/move the file.";
 	}			
@@ -631,7 +632,7 @@ IOException
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return "Could not rename/move the directory.";
 	}

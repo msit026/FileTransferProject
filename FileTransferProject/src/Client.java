@@ -143,7 +143,7 @@ public class Client
 							   {
 								   array=new byte[c];
 								   System.arraycopy(buf, 0, array, 0,c);
-								   System.out.println(array.length + "-- In while of client : " + (++count));
+								   //System.out.println(array.length + "-- In while of client : " + (++count));
 								  // bos.write(buf,0,buf.length);
 								   bos.write(array);  
 							   }
@@ -186,18 +186,18 @@ public class Client
 							byte[] array;
 						   int c;
 						   int count = 0;
-						   while((c=bis.read(buf))!=-1)//try with >0
+						   while((c=bis.read(buf))>0)//try with >0
 						   {
 							   array = new byte[c];
 							   System.arraycopy(buf, 0, array, 0, c);
-								  System.out.println(array.length +"In while of client download: " + (++count));
+								  //System.out.println(array.length +"In while of client download: " + (++count));
 								   bos.write(array);
 								   bos.flush();
 						   }
 							bos.close();
-							System.out.println("Client closed!");
+							//System.out.println("Client closed!");
 							File f = new File(commandgiven[2]+"/"+ commandgiven[1]);
-							System.out.println("Client closed12!");
+							//System.out.println("Client closed12!");
 							out.writeUTF(f.length() + "");
 							dataSocket.close();
 							String msg = in.readUTF();
