@@ -10,7 +10,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -32,6 +31,7 @@ public class Command
     static String path = "D:/FTP"; // current path
     static String rootDir = "D:/FTP"; // root Directory
     static String filePath;
+    static int usercount=0;
    
     public static void setid(String i)
     {
@@ -42,101 +42,143 @@ public class Command
 	public static  String command(String cmd) throws 
 IOException
 	{
-		String[] cmdSplit = cmd.split(" ");
-		if (cmdSplit[0].equalsIgnoreCase("list"))
-			return displayAllFiles();
-		if(cmdSplit[0].equalsIgnoreCase("newdir"))
-			return newDir(cmdSplit[1]);
-		if(cmdSplit[0].equalsIgnoreCase("changedir"))
+		try
 		{
-			if(cmdSplit.length > 1) // if a path is specified, change directory to that path
-				return changeDir(rootDir + "/" + cmdSplit[1]);
-			else  // if no path is specified, change directory to root folder
-				return changeDir(rootDir);
-		}
-		
-		if(cmdSplit[0].equalsIgnoreCase("help"))
-			
-			 return help();
-		
-		
-		if(cmdSplit[0].equalsIgnoreCase("delete"))
-			return delete(path + "/" + cmdSplit[1]);
-		if(cmdSplit[0].equalsIgnoreCase("rename"))
-			return rename(path + "/" + cmdSplit[1],path + "/" + cmdSplit[2]);
-		if(cmdSplit[0].equalsIgnoreCase("move"))
-		{
-			if(cmdSplit.length > 2) // if destination path is specified, move the file to destination path(Ex: move abc.txt directory1)
-				return rename(path + "/" + cmdSplit[1],rootDir + "/" + cmdSplit[2] + "/" + cmdSplit[1].substring(cmdSplit[1].lastIndexOf('/') + 1));
-			else //if no destination is specified, move the file/directory to root folder(Ex: move abc.txt)
-				return rename(path + "/" + cmdSplit[1],rootDir + "/" + cmdSplit[1].substring(cmdSplit[1].lastIndexOf('/') + 1));
-		}
-		if(cmdSplit[0].equalsIgnoreCase("logout"))
-			return "";
-				
-		if(cmd.contains("upload"))
-		{
-			System.out.println("inside upload");
-			String destinationpath="D:/FTP";
-			String[] k=cmd.split(" ");
-			k[1].replace('\\','/');
-			String path=k[1]+"/"+k[2];
-			System.out.println(path);
-			String kr=destinationpath+"/"+k[2];
-			if(k.length==3)
+			String[] cmdSplit = cmd.split(" ");
+			if (cmdSplit[0].equalsIgnoreCase("list"))
+				return displayAllFiles();
+			if(cmdSplit[0].equalsIgnoreCase("newdir"))
+				return newDir(cmdSplit[1]);
+			if(cmdSplit[0].equalsIgnoreCase("changedir"))
 			{
-				
-				try {
-		            in = new FileInputStream(path);
-		            out = new FileOutputStream(kr);
-		            int c;
-
-		            while ((c = in.read()) != -1) {
-		                out.write(c);
-		            }
-		        } finally {
-		            if (in != null) {
-		                in.close();
-		            }
-		            if (out != null) {
-		                out.close();
-		            }
-		        }					
+				if(cmdSplit.length > 1) // if a path is specified, change directory to that path
+					return changeDir(path + "/" + cmdSplit[1]);
+				else  // if no path is specified, change directory to root folder
+					return changeDir(rootDir);
 			}
-			else
+			
+			if(cmdSplit[0].equalsIgnoreCase("help"))
+				
+				 return help();
+			
+			
+			if(cmdSplit[0].equalsIgnoreCase("delete"))
+				return delete(path + "/" + cmdSplit[1]);
+			if(cmdSplit[0].equalsIgnoreCase("rename"))
+				return rename(path + "/" + cmdSplit[1],path + "/" + cmdSplit[2]);
+			if(cmdSplit[0].equalsIgnoreCase("move"))
 			{
-				File f=new File(destinationpath+"/"+k[3]);
-				//System.out.println(destinationpath+"\\\\"+k[3]);
-				FileReader fr = null;
-		        FileWriter fw=null;
-		        String temp="";
-				try {
-					//System.out.println(path);
-					fr = new FileReader(path);
-					//System.out.println("after fr");
-                   fw=new FileWriter(f);
-                   //System.out.println("after fw");
-					int c =fr.read();
-					while (c != -1)
-					{
-						fw.write(c);
-						c = fr.read();
-					}
-					fw.close();
-					String aa="uploaded sucessfully with name "+k[3];
-					return aa;
-		        }
-				catch (IOException e) {
-					e.printStackTrace();
+				if(cmdSplit.length > 2) // if destination path is specified, move the file to destination path(Ex: move abc.txt directory1)
+					return rename(path + "/" + cmdSplit[1],rootDir + "/" + cmdSplit[2] + "/" + cmdSplit[1].substring(cmdSplit[1].lastIndexOf('/') + 1));
+				else //if no destination is specified, move the file/directory to root folder(Ex: move abc.txt)
+					return rename(path + "/" + cmdSplit[1],rootDir + "/" + cmdSplit[1].substring(cmdSplit[1].lastIndexOf('/') + 1));
+			}
+			if(cmdSplit[0].equalsIgnoreCase("logout"))
+				return "Bye!";
+					
+			if(cmd.contains("upload"))
+			{
+				System.out.println("inside upload");
+				String destinationpath="D:/FTP";
+				String[] k=cmd.split(" ");
+				k[1].replace('\\','/');
+				String path=k[1]+"/"+k[2];
+				System.out.println(path);
+				String kr=destinationpath+"/"+k[2];
+				if(k.length==3)
+				{
+					
+					try {
+			            in = new FileInputStream(path);
+			            out = new FileOutputStream(kr);
+			            int c;
+	
+			            while ((c = in.read()) != -1) {
+			                out.write(c);
+			            }
+			        } finally {
+			            if (in != null) {
+			                in.close();
+			            }
+			            if (out != null) {
+			                out.close();
+			            }
+			        }					
 				}
+				else
+				{
+					File f=new File(destinationpath+"/"+k[3]);
+					//System.out.println(destinationpath+"\\\\"+k[3]);
+					FileReader fr = null;
+			        FileWriter fw=null;
+			        
+					try {
+						//System.out.println(path);
+						fr = new FileReader(path);
+						//System.out.println("after fr");
+	                   fw=new FileWriter(f);
+	                   //System.out.println("after fw");
+						int c =fr.read();
+						while (c != -1)
+						{
+							fw.write(c);
+							c = fr.read();
+						}
+						fw.close();
+						String aa="Uploaded sucessfully with name "+k[3];
+						return aa;
+			        }
+					catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				
 			}
-			
+			return "No command";
 		}
-		return "no command";
-		
+		catch(ArrayIndexOutOfBoundsException e)
+		{
+			return "No command";
+		}
 		
 	}
 	
+	public static void showreports() {
+		System.out.println("------------------------------\nReports:");
+		try{
+			Connection c=connection.getConnection();                     //to get connected with the database
+			Statement smt=c.createStatement();
+			String q="select * from files";
+			ResultSet r=smt.executeQuery(q);
+			int count=0;
+			while(r.next())
+				count++;
+			System.out.println("Total number of files in server is: " + count);
+			
+			System.out.println("Number of users currently logged in: "+usercount);
+			smt=c.createStatement();
+			String sr="select * from files where isUnderDownload='1';";
+			ResultSet rr=smt.executeQuery(sr);
+			int f=0;
+		     while(rr.next())
+		    	 f++;
+			System.out.println("Number of File under download: "+f);
+		}
+		catch(Exception e)
+		{
+			System.out.println("Error in reports!");
+		}
+	}
+	public static void incUser()   ////call this function after thread created write statement
+	{
+		usercount++;
+	}
+	
+	public static void decUser() ////call this when ever the socket is closed
+	{
+		usercount--;
+	}
+
 	static int check = 0;
 	public static String uploadintofile(byte[] x) throws 
 IOException
@@ -154,9 +196,26 @@ IOException
 		return "ready";
 	}
 	
-	public static void closeFile() throws Exception
+	public static boolean closeFileAndVerify(long fileSize) throws Exception
 	{
-		fos.close();
+		if(fos != null)  // if upload
+			fos.close();
+		if(bis != null) // if download
+			bis.close();
+		File f = new File(filePath);
+		if(f.length() == fileSize)
+		{
+			return true;
+		}
+		else
+		{
+			if(fos != null && bis == null)// if upload
+			{
+				f.delete();
+				System.out.println("Here in closefile of command");
+			}
+			return false;
+		}
 	}
 	
 	
@@ -202,23 +261,48 @@ IOException
 	public static String displayAllFiles() //Displays all the files in the given directory
 	{
 		System.out.println("inside displayfiels");
-		//String path = "D:/FTP";   //path
+		
 		  String files="";
 		  File folder = new File(path);
 		  File[] listOfFiles = folder.listFiles(); // gives the name of all the files
 		 
 		  for (int i = 0; i < listOfFiles.length; i++) 
 		  {
-		 
-		   if (listOfFiles[i].isFile()) 
-		   {
-		      files =files+"#"+listOfFiles[i].getName(); // all files in a string with # as delimiter
-		   }
+			  
+			   if (listOfFiles[i].isFile() && isFileInDB(listOfFiles[i])) 
+			   {
+			      files =files+"#"+listOfFiles[i].getName(); // all files in a string with # as delimiter
+			   }
+			   
 		  }
-		return files;
+		  if(files.equalsIgnoreCase(""))
+			  return "No files to display!";
+		 return files;
+	}
+
+	public static boolean isFileInDB(File file) {
+		Connection con;
+		count=0;
+		try 
+		{
+			con = connection.getConnection();
+			Statement stmt=con.createStatement();
+			String q = "select * from files where file_name = '" + file.getName() + "';";
+			ResultSet res = stmt.executeQuery(q);
+			
+			if(res.next())
+			{
+				return true;
+			}
 		}
-	
-	
+		catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}       
+		return false;
+	}
+
+
 	public static void initiateDownLoad(String command) 
 	{
 		System.out.println("inside initiate download");
@@ -273,11 +357,11 @@ IOException
 			Connection con=connection.getConnection();                     //to get connected with the database
 			Statement stmt=con.createStatement();
 			String q="select * from directories where dir_name = '" + path + "';";	//checking in the database if dir with given name exists
-			boolean res = stmt.execute(q);
+			ResultSet res = stmt.executeQuery(q);
 			File theDir = new File(path + "/" + dirName);
 
 			  
-			if (!(theDir.exists() && res)) {
+			if (!(theDir.exists() && res.next())) {
 				
 				boolean result = theDir.mkdir();  // if the directory does not exist, create it
 				q = "insert into directories values('"+ path + "/" + dirName +"', '" + id + "')";  // insert into DB
@@ -343,11 +427,12 @@ IOException
 			Connection con=connection.getConnection();                     //to get connected with the database
 			Statement stmt=con.createStatement();
 			String q="select * from directories where dir_name = '" + newName + "';";	//checking in the database if dir with given name exists
-			boolean res = stmt.execute(q);
+			ResultSet res = stmt.executeQuery(q);
 	
-			if (res) {
+			if (res.next()) {
 				q = "select * from directories where dir_name = '" + newName + "' and id = '" + id + "';";
-				if(stmt.execute(q))
+				ResultSet res1 = stmt.executeQuery(q);
+				if(res1.next())
 				{
 					q = "delete from directories where dir_name = '" + newName + "' and id = '" + id + "';";
 					int r = stmt.executeUpdate(q);
@@ -385,11 +470,12 @@ IOException
 			Connection con=connection.getConnection();                     //to get connected with the database
 			Statement stmt=con.createStatement();
 			String q="select * from files where file_path = '" + newName + "';";	//checking in the database if dir with given name exists
-			boolean res = stmt.execute(q);
+			ResultSet res = stmt.executeQuery(q);
 	
-			if (res) {
+			if (res.next()) {
 				q = "select * from files where file_path = '" + newName + "' and id = '" + id + "' and isUnderDownload = 0;";
-				if(stmt.execute(q))
+				ResultSet res1 = stmt.executeQuery(q);
+				if(res1.next())
 				{
 					q = "delete from files where file_path = '" + newName + "' and id = '" + id + "';";
 					int r = stmt.executeUpdate(q);
@@ -446,15 +532,19 @@ IOException
 			Connection con=connection.getConnection();                     //to get connected with the database
 			Statement stmt=con.createStatement();
 			String q="select * from files where file_path = '" + oldName + "';";	//checking in the database if dir with given name exists
-			boolean res = stmt.execute(q);
+			ResultSet res = stmt.executeQuery(q);
 	
-			if (res) {
+			if (res.next()) {
 				q = "select * from files where file_path = '" + oldName + "' and id = '" + id + "' and isUnderDownload = 0;";
-				if(stmt.execute(q))
+				ResultSet res1 = stmt.executeQuery(q);
+				if(res1.next())
 				{
 					q = "delete from files where file_path = '" + oldName + "' and id = '" + id + "';";
 					int r = stmt.executeUpdate(q);
-					q = "insert into files values('" + newName + "', '" + id + "', " + (new File(newName)).length() + ", 0, '" + newFileName + "');";
+					File f4 = new File(oldName);
+					System.out.println("file size: " + f4.length());
+					q = "insert into files values('" + newName + "', '" + id + "', '" + f4.length() + "', 0, '" + newFileName + "');";
+					System.out.println("query : " + q);
 					int r1 = stmt.executeUpdate(q);
 					if(r > 0 && r1 > 0)
 					{
@@ -500,11 +590,12 @@ IOException
 			Connection con=connection.getConnection();                     //to get connected with the database
 			Statement stmt=con.createStatement();
 			String q="select * from directories where dir_name = '" + oldName + "';";	//checking in the database if dir with given name exists
-			boolean res = stmt.execute(q);
+			ResultSet res = stmt.executeQuery(q);
 	
-			if (res) {
+			if (res.next()) {
 				q = "select * from directories where dir_name = '" + oldName + "' and id = '" + id + "';";
-				if(stmt.execute(q))
+				ResultSet res1 = stmt.executeQuery(q);
+				if(res1.next())
 				{
 					q = "delete from directories where dir_name = '" + oldName + "' and id = '" + id + "';";
 					int r = stmt.executeUpdate(q);
@@ -555,7 +646,7 @@ IOException
 			Connection con=connection.getConnection();                     //to get connected with the database
 			Statement stmt=con.createStatement();
 			String q="update user_details set last_logged_in = '" + sqlDate + "' where id = '" + id + "';";	//checking in the database if dir with given name exists
-			int res = stmt.executeUpdate(q);
+			stmt.executeUpdate(q);
 		}catch(Exception e)
 		{
 			
@@ -571,15 +662,38 @@ IOException
 		String download="Download -- To download a file fromt the server \n \t\t Syntax: download <FileName> <Path>\n------------------------------------------------------------------------------------------\n";
 		String delete="Delete -- To delete a file from the server\n\t\t Syntax: delete <File Name>\n------------------------------------------------------------------------------------------\n";
 		String changedir="Change directory -- To change the directory we are working on\n\t\t Syntax: changedir <Path>\n------------------------------------------------------------------------------------------\n";
-		String rename="Rename -- To rename the file in the server\n\t\t Syntax: rename <File Name>\n------------------------------------------------------------------------------------------\n";
+		String rename="Rename -- To rename the file in the server\n\t\t Syntax: rename <File Name> <New File Name>\n------------------------------------------------------------------------------------------\n";
 		String logout="Logout -- To logout and close the session\n\t\t Syntax: logout\n------------------------------------------------------------------------------------------\n";
 		String move="Move -- To move a file in the server from one directory to another\n\t\t Syntax: move <File Name> <path>\n------------------------------------------------------------------------------------------\n";
-        String help="Help -- Display all the commands and syntax \n\t\t Syntax: move <File Name> <path>\n------------------------------------------------------------------------------------------\n";
+        String help="Help -- Display all the commands and syntax \n\t\t Syntax: help\n------------------------------------------------------------------------------------------\n";
 		String newdir="New directory -- To create a new directory\n\t\t Syntax: newdir <directory>\n------------------------------------------------------------------------------------------\n";
 		String cmp=mar+list+newdir+changedir+logout+upload+download+delete+rename+move+help;
 		return cmp;
 	}
 
+
+	public static boolean usernameExists(String id) 
+	{
+		try
+		{
+			Connection con=connection.getConnection();                     //to get connected with the database
+			Statement stmt=con.createStatement();
+			String q="select * from user_details where id = '" + id + "';";	//checking in the database if dir with given name exists
+			ResultSet res = stmt.executeQuery(q);
+			
+			if(res.next())
+			{
+				return true;
+			}
+			
+		}catch(Exception e)
+		{
+			System.out.println("Error in user name existance check method");
+		}
+		return false;
+	}
+
+	
 
 }
 
